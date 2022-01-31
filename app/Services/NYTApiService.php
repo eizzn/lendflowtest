@@ -24,6 +24,7 @@ class NYTApiService implements BaseService
     public function getBestSellers(array $params): Collection
     {
         $params['api-key'] = $this->apiKey;
+        $url = $this->apiBaseUrl . '/lists/best-sellers/history.json?';
         // the NYT API seems to only accept one isbn at a time
         // if isbn provided, loop over each and combine results
         if (array_key_exists('isbn', $params)) {
@@ -32,7 +33,7 @@ class NYTApiService implements BaseService
             foreach ($params['isbn'] as $isbn) {
                 $tmpParams['isbn'] = $isbn;
                 $formattedParams = http_build_query($tmpParams);
-                $response = Http::get($this->apiBaseUrl . '/lists/best-sellers/history.json?' . $formattedParams);
+                $response = Http::get($url . $formattedParams);
                 $body = json_decode($response->body());
                 foreach ($body->results as $result) {
                     $results[] = $result;
@@ -40,7 +41,7 @@ class NYTApiService implements BaseService
             }
         } else {
             $formattedParams = http_build_query($params);
-            $response = Http::get($this->apiBaseUrl . '/lists/best-sellers/history.json?' . $formattedParams);
+            $response = Http::get($url . $formattedParams);
 
             $body = json_decode($response->body());
             $results = $body->results;
